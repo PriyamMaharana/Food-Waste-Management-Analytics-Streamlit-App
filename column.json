@@ -1,0 +1,35 @@
+{
+    "claim_data": {
+        "claim_id": "int",
+        "food_id": "int",
+        "receiver_id": "int",
+        "status": "string",
+        "timestamp": "datetime"
+    },
+    "food_data": {
+        "food_id": "int",
+        "food_name": "string",
+        "quantity": "int",
+        "expiry_date": "datetime",
+        "provider_id": "int",
+        "provider_type": "string",
+        "location": "string",
+        "food_type": "string",
+        "meal_type": "string"
+    },
+    "provider_data": {
+        "provider_id": "int",
+        "name": "string",
+        "type": "string",
+        "address": "string",
+        "city": "string",
+        "contact": "int"
+    },
+    "receiver_data": {
+        "receiver_id": "int",
+        "name": "string",
+        "type": "string",
+        "city": "string",
+        "contact": "int"
+    }
+}
