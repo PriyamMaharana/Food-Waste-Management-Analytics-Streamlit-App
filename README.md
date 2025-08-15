@@ -1,0 +1,1 @@
+# Food-Waste-Management-Analytics-Streamlit-App
