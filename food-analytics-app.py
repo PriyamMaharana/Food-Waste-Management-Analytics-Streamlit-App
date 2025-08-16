@@ -26,8 +26,8 @@ body, .main, .block-container, #root {
   min-height: 100vh;
 }
 .block-container {
-  padding-left: 2rem !important;
-  padding-right: 2rem !important;
+  padding-left: 0rem !important;
+  padding-right: 0rem !important;
 }
 /* ==== SIDEBAR: Dark mirrored glass with deep blur, highly contrasted ==== */
 section[data-testid="stSidebar"] {
@@ -1034,6 +1034,7 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
 
 
