@@ -96,6 +96,23 @@ h1, h2, h3 {
     flex-direction: column !important;
     gap: 18px !important;
   }
+   section[data-testid="stSidebar"] {
+      z-index: 1002 !important;
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      height: 100vh !important;
+      width: 88vw !important;
+      max-width: 420px !important;
+      min-width: 200px !important;
+      background: #0b1324 !important;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.28) !important;
+      transition: transform 0.3s cubic-bezier(.3,1.25,.6,1), box-shadow 0.2s;
+  }
+  section[data-testid="stSidebar"] + div[role="main"],
+  div[data-testid="stSidebar"] + div[role="main"] {
+      margin-left: 0 !important;
+  }
   .kpi-row {
     display: flex;
     flex-wrap: wrap;
@@ -851,3 +868,4 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
