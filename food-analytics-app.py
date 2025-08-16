@@ -51,7 +51,8 @@ h1, h2, h3 { color: #111827; }
 """, unsafe_allow_html=True)
 
 # -------------------- DB CONNECTION --------------------
-engine = create_engine('postgresql+psycopg2://postgres:1234@localhost:5432/food_db')
+# engine = create_engine('postgresql+psycopg2://postgres:1234@localhost:5432/food_db')
+engine = create_engine('postgresql://food_db_pl5v_user:AJUC866X0m9y76r1Pl9mneeghYCDiq95@dpg-d2fphi8dl3ps73eh4h6g-a.singapore-postgres.render.com/food_db_pl5v')
 
 def run_query(query, params=None):
     with engine.connect() as conn:
