@@ -33,8 +33,8 @@ body, .main, .block-container, #root {
 section[data-testid="stSidebar"] {
     position: relative !important;
     background: linear-gradient(120deg, rgba(255,255,255,0.16) 0%, rgba(14,17,23,0.58) 25%, rgba(14,17,23,0.45) 85% );
-    backdrop-filter: blur(14px) saturate(1.18);
-    -webkit-backdrop-filter: blur(18px) saturate(1.18);
+    backdrop-filter: blur(10px) saturate(1.18);
+    -webkit-backdrop-filter: blur(10px) saturate(1.18);
     box-shadow: 0 8px 32px 0 rgba(31,38,135,0.19), 0 1.5px 9px 0 rgba(32,34,51,0.27) inset;
     border-right: 2px solid rgba(255,255,255,0.12);
     min-height: 100vh !important;
@@ -1034,6 +1034,7 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
 
 
