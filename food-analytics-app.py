@@ -17,168 +17,342 @@ st.set_page_config(
 # Subtle, modern CSS
 st.markdown("""
 <style>
-/* === App wide spacing and sidebar background === */
-.main { padding-top: 1rem; }
-section[data-testid="stSidebar"] { background: #0b1324; }
-.st-emotion-cache-1wbqy5l { padding-top: 0 !important; }
+/* === Main area: deep navy/indigo gradient, matching graph backgrounds === */
+body, .main, .block-container, #root {
+  background-color: #0E1117 !important;
+  color: #e0e4ee;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.05rem;
+  min-height: 100vh;
+}
+.block-container {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+/* ==== SIDEBAR: Dark mirrored glass with deep blur, highly contrasted ==== */
+section[data-testid="stSidebar"] {
+    position: relative !important;
+    background: linear-gradient(120deg, rgba(255,255,255,0.16) 0%, rgba(14,17,23,0.58) 25%, rgba(14,17,23,0.45) 85% );
+    backdrop-filter: blur(14px) saturate(1.18);
+    -webkit-backdrop-filter: blur(18px) saturate(1.18);
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.19), 0 1.5px 9px 0 rgba(32,34,51,0.27) inset;
+    border-right: 2px solid rgba(255,255,255,0.12);
+    min-height: 100vh !important;
+    height: 100vh !important;
+    padding-top: 3rem !important;
+    width: 450px !important;
+    transition: width 0.22s cubic-bezier(.32,1.13,.44,.99), left 0.19s cubic-bezier(.32,1.13,.44,.99);
+    z-index: 1020 !important;
+    overflow: hidden !important;
+    font-size: 0.93rem !important;
+}
+/* Overlay mode (overlay/collapsible for width <1400px) */
+@media (max-width: 1399px) {
+    section[data-testid="stSidebar"] {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 85vw !important;
+        min-width: 140px !important;
+        max-width: 400px !important;
+        height: 100vh !important;
+        z-index: 3000 !important;
+        box-shadow: 18px 0 44px 0 rgba(18,18,40,0.31)!important;
+        overflow: hidden !important;
+   }
+  section[data-testid="stSidebar"][aria-expanded="false"] {
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        left: 0 !important;
+        z-index: 3000 !important;
+        pointer-events: none !important;
+  }
+  .main, .block-container {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: 100vw;
+        margin: 0;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        transition: margin 0.22s cubic-bezier(.32,1.13,.44,.99);
+  }
+  button[data-testid="baseButton-sidebarCollapse"],
+  button[data-testid="baseButton-sidebarClose"] {
+        position: fixed !important;
+        left: 15px !important;
+        top: 22px !important;
+        width: 45px !important;
+        height: 45px !important;
+        z-index: 1015  !important;
+        background: #181b2b !important;
+        color: #ecebf8 !important;
+        border-radius: 14px 4px 14px 4px !important;
+        opacity: 1 !important;
+        display: block !important;
+        box-shadow: 0 3px 28px rgba(24,20,40,0.25);
+  }
+}
+@media (min-width: 1400px) {
+    [data-testid="stAppViewContainer"],
+    .block-container {
+        max-width: 100vw !important;
+        transition: margin 0.22s cubic-bezier(.32,1.13,.44,.99);
+    }
+    /* Keep padding on main content */
+    .block-container {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+    [data-testid="stAppViewContainer"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
 
-/* === KPI Cards styling === */
-.kpi-row > div[data-testid="column"] { 
-    min-width: 0; 
+    /* When sidebar collapsed, fill full width */
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ [data-testid="stAppViewContainer"],
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ .block-container,
+    .block-container {
+        margin: 0 auto !important;
+        max-width: 100vw !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
 }
-.kpi-card {
-  padding: 16px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  color: #fff;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 16px;
+/* Sidebar content enhancements */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2 {
+  color: #fafdff !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 1.95rem !important;
+  letter-spacing: .07rem;
+  padding: 1rem;
+  padding-left: 0rem;
+  text-shadow: 0 8px 32px #2a0d6099, 0 2px 12px #10162980;
 }
-.kpi-title {
-  font-size: 13px;
-  color: #93c5fd;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 4px;
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] .stMarkdown { color: #b6b4d7 !important; font-size: 1em !important; margin-bottom: 1.08em;}
+section[data-testid="stSidebar"] label {
+  color: #e4e6fa !important;
+  font-size: 1.0rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.44rem !important;
+  margin-top: 1.09rem !important;
+  letter-spacing: .04rem;
+  padding-left: .75rem;
+  display: block;
+  text-shadow: 0 2px 10px #11123d71;
 }
-.kpi-value {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 6px;
+section[data-testid="stSidebar"] select,
+section[data-testid="stSidebar"] input[type="date"],
+section[data-testid="stSidebar"] .stSelectbox,
+section[data-testid="stSidebar"] .stDateInput {
+  background: rgba(15,17,28,0.99) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #4965fb !important;
+  border-radius: 15px !important;
+  margin-bottom: .6em !important;
+  font-size: 0.95rem !important;
+  box-shadow: 0 4px 24px rgba(31,60,120,0.19);
+  padding: 7px 7px !important;
 }
-.kpi-sub {
-  font-size: 12px;
-  color: #d1d5db;
+section[data-testid="stSidebar"] select:focus,
+section[data-testid="stSidebar"] input[type="date"]:focus,
+section[data-testid="stSidebar"] .stSelectbox:focus-within,
+section[data-testid="stSidebar"] .stDateInput:focus-within {
+  border: 2px solid #b38dfa !important;
+  box-shadow: 0 0 12px 2px #9f61f5a0 !important;
+  outline: none !important;
+}
+section[data-testid="stSidebar"] input::placeholder { color: #bbc7fd !important; }
+
+/* === Cards, dataframes, KPI blocks === */
+.kpi-card, .metric-card, .big-card {
+  background: linear-gradient(121deg, #21233a 0%, #232756 100%);
+  border-radius: 17px;
+  padding: 19px 21px 15px 21px;
+  margin-bottom: 21px;
+  color: #fafdff !important;
+  box-shadow: 0 7px 21px rgba(25,20,61,0.23);
+  border: 2px solid #8cb6ff; 
+}
+.kpi-title { font-size: 1.05rem; color:#7c8cff; font-weight: 700; margin-bottom: 7px; letter-spacing:.055em; }
+.kpi-value { font-size: 2.22rem; font-weight: 900; letter-spacing:.045em; margin-bottom: 8px; }
+.kpi-sub { font-size: .97em; color: #bdd3ea; }
+
+div[data-testid="stDataFrame"] {
+  background: linear-gradient(122deg, #202440 0%, #181929 120%);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px #1c185a77;
+  color: #e0eeff !important;
+  font-size: 1.02em !important;
+  margin-bottom: 27px;
+  overflow-x: auto;
+  padding: 15px 8px !important;
 }
 
-/* === Tabs: Desktop (Default) === */
+/* === Tabs, Buttons, Headings as per your theme === */
 .stTabs [role="tablist"] {
-    font-size: 1.8em !important;
-    font-weight: 600 !important;
-    padding: 0.4em 1.2em !important;
+  font-size: 1.18em !important;
+  font-weight: 600 !important;
+  background: transparent !important;
+  padding: 0 1rem !important;
+  border: none !important;
 }
 .stTabs [role="tab"] {
-    min-width: 140px !important;
+  min-width: 120px !important;
+  padding: 10px 15px !important;
+  color: #b7bee3;
+  border: none !important;
+  border-bottom: 2px solid transparent;
+  transition: color 0.22s, border 0.22s;
 }
-.stTabs [role="tab"] svg {
-    width: 1.5em !important;
-    height: 1.5em !important;
+.stTabs [role="tab"][aria-selected="true"] {
+  color: #ae7cf7 !important;
+  border-bottom: 2.6px solid #bb7efd !important;
+  font-weight: 800 !important;
 }
-
-/* === Dataframes styling === */
-div[data-testid="stDataFrame"] {
-  border-radius: 12px;
-  overflow-x: auto;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
+.stTabs [role="tab"]:hover {
+  color: #fff6fd;
+  background: #322b4e38;
 }
-
-/* === Headings custom color === */
 h1, h2, h3 {
-  color: #FFFFFF !important;
+    color: #e8ecff !important; 
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
 }
-
-/* === Buttons styling === */
 .stButton > button {
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
+  background: linear-gradient(125deg,#373ce8 25%, #946ef1 85%);
+  color: #ecebfa;
+  border-radius: 14px;
+  padding: 0.54rem 1.26rem;
+  font-weight: 800;
+  border: none;
+  font-size: 1.06em;
+  box-shadow: 0 3px 14px #5f45e744;
+  transition: background 0.19s, color 0.16s, box-shadow 0.09s;
+}
+.stButton > button:hover {
+  background: #8057fc !important;
+  color: #fff !important;
+  box-shadow: 0 8px 26px #8350fda0;
 }
 
-/* === Responsive layout adjustments === */
-
-/* Stack columns vertically and add gap on smaller than 900px */
+/* --- Responsive tweaks --- */
 @media (max-width: 900px) {
-  .st-emotion-cache-1wbqy5l section[data-testid="column"],
-  .st-emotion-cache-1wbqy5l section[data-testid="stHorizontalBlock"] {
-    flex-direction: column !important;
-    gap: 18px !important;
+  .main { padding-top: 0.6rem; }
+  .kpi-card, .metric-card, .big-card { padding: 13px !important; margin-bottom: 14px; }
+}
+@media (max-width: 600px) {
+  section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2 {
+    font-size: 1.07rem !important;
+    padding: 0 2px !important;
   }
-   section[data-testid="stSidebar"] {
-      z-index: 1002 !important;
-      position: fixed !important;
-      left: 0 !important;
-      top: 0 !important;
-      height: 100vh !important;
-      width: 88vw !important;
-      max-width: 420px !important;
-      min-width: 200px !important;
-      background: #0b1324 !important;
-      box-shadow: 2px 0 16px rgba(0,0,0,0.28) !important;
-      transition: transform 0.3s cubic-bezier(.3,1.25,.6,1), box-shadow 0.2s;
+  .kpi-card, .metric-card, .big-card { font-size: 0.92em !important; }
+  div[data-testid="stDataFrame"] { font-size: 13px !important; }
+  .stTabs [role="tablist"] {
+    font-size: .98em !important;
+    flex-wrap: wrap !important;
+    padding-bottom: 6px !important;
   }
-  section[data-testid="stSidebar"] + div[role="main"],
-  div[data-testid="stSidebar"] + div[role="main"] {
-      margin-left: 0 !important;
-  }
-  .kpi-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px 12px;
-  }
-  .kpi-row > div[data-testid="column"] {
-    flex: 0 0 48%;
-    max-width: 48%;
-    min-width: 200px;
-    margin-bottom: 0 !important;
-  }
-  .kpi-card {
-    margin-bottom: 20px !important;
-    height: 130px !important;
-  }
-  .kpi-value {
-    font-size: 22px !important;
-  }
-  .stTabs [role="tablist"] span {
-      font-size: 1.5em !important;
-      padding: 0.32em 0.8em !important;
-  }
-  .stTabs [role="tab"] {
-      min-width: 100px !important;
-  }
-  .stTabs [role="tab"] svg {
-      width: 1.25em !important;
-      height: 1.25em !important;
+  .stTabs [role="tab"] { min-width: 95px !important; padding: 8px 7px !important; }
+}
+
+/* Copyright at bottom as visual footer - use ONLY CSS, not markdown! */
+section[data-testid="stSidebar"]::after {
+    content: "© Priyam Maharana";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18px;
+    width: 95%;
+    margin: 0 auto;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #b8bde7;
+    opacity: 0.76;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 5000;
+    padding-bottom: 2px;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+@media (max-width: 600px) {
+  section[data-testid="stSidebar"]::after {
+      font-size: 1.3rem;
+      padding-bottom: 7px;
   }
 }
 
-/* Mobile specific adjustments for devices <=600px */
+/* Make the tab labels larger, including emoji (default for desktop) */
+@media (min-width: 1000px) {
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+    font-size: 1.45rem !important;
+    gap: 18px !important;
+    }
+    [data-baseweb="tab"] {
+        font-size: 1.40rem !important;
+        font-weight: 600 !important;
+        padding: 15px 20px !important;
+        line-height: 1.05 !important;
+        min-height: 55px;
+        min-width: 85px;
+    }
+    [data-baseweb="tab"] > div {
+    font-size: 1.68rem !important;
+    font-weight: 600 !important;
+    }
+}
+
+/* Responsive: Medium screens (tablet) */
+@media (max-width: 999px) {
+  [data-testid="stTabs"] [data-baseweb="tab-list"] {
+    font-size: 1.09em !important;
+    gap: 12px !important;
+  }
+  [data-baseweb="tab"] {
+    font-size: 1.07em !important;
+    padding: 9px 10px !important;
+    min-width: 68px;
+  }
+  [data-baseweb="tab"] > div {
+    font-size: 1.04em !important;
+  }
+}
+
+/* Responsive: Small/mobile screens */
 @media (max-width: 600px) {
-  .kpi-card {
-    padding: 12px !important;
-    font-size: 15px !important;
-  }
-  .kpi-row > div[data-testid="column"] {
-    flex: 0 0 100%;
-    max-width: 100%;
-    min-width: 140px;
-  }
-  h1, h2, h3 {
-    font-size: 1.6em !important;
-    padding-top: 6px !important;
-    padding-bottom: 4px !important;
-  }
-  div[data-testid="stDataFrame"] {
-    font-size: 13px !important;
-    max-width: 98vw;
-  }
-  .stTabs [role="tablist"] {
-    flex-wrap: wrap !important;
-  }
-  /* Tabs for mobile */
-  [data-testid="stTabs"] [role="tablist"] span {
-      font-size: 1.0em !important;
-      padding: 0.2em 0.5em;
-  }
-  [data-testid="stTabs"] [role="tab"] {
-      min-width: 60px !important;
-  }
-  [data-testid="stTabs"] [role="tab"] svg {
-      width: 1em !important;
-      height: 1em !important;
-  }
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+        font-size: 0.57rem !important;
+        overflow-x: auto !important;    
+        overflow-y: hidden !important;
+        white-space: nowrap !important;  
+        flex-wrap: nowrap !important;     
+    }
+    [data-baseweb="tab"][aria-selected="true"],
+    .stTabs [role="tab"][aria-selected="true"] {
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+    [data-baseweb="tab"] {
+        font-size: 0.75rem !important;
+        padding: 5px 2px !important;
+        min-width: 44px;
+        flex: 0 0 auto !important;
+    }
+    [data-baseweb="tab"] > div {
+        font-size: 1.18rem !important;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -868,4 +1042,5 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
