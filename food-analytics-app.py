@@ -53,15 +53,15 @@ section[data-testid="stSidebar"] { background: #0b1324; }
 }
 
 /* === Tabs: Desktop (Default) === */
-[data-testid="stTabs"] [role="tablist"] span {
-    font-size: 1.5em !important;
-    font-weight: 600;
-    padding: 0.4em 1.2em;
+.stTabs [role="tablist"] {
+    font-size: 1.8em !important;
+    font-weight: 600 !important;
+    padding: 0.4em 1.2em !important;
 }
-[data-testid="stTabs"] [role="tab"] {
+.stTabs [role="tab"] {
     min-width: 140px !important;
 }
-[data-testid="stTabs"] [role="tab"] svg {
+.stTabs [role="tab"] svg {
     width: 1.5em !important;
     height: 1.5em !important;
 }
@@ -109,19 +109,19 @@ h1, h2, h3 {
   }
   .kpi-card {
     margin-bottom: 20px !important;
+    height: 130px !important;
   }
   .kpi-value {
-    font-size: 20px !important;
+    font-size: 22px !important;
   }
-  /* Tabs for tablet */
-  [data-testid="stTabs"] [role="tablist"] span {
-      font-size: 1.3em !important;
-      padding: 0.32em 0.8em;
+  .stTabs [role="tablist"] span {
+      font-size: 1.5em !important;
+      padding: 0.32em 0.8em !important;
   }
-  [data-testid="stTabs"] [role="tab"] {
+  .stTabs [role="tab"] {
       min-width: 100px !important;
   }
-  [data-testid="stTabs"] [role="tab"] svg {
+  .stTabs [role="tab"] svg {
       width: 1.25em !important;
       height: 1.25em !important;
   }
@@ -845,6 +845,7 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
 
 
