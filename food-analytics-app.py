@@ -269,7 +269,7 @@ section[data-testid="stSidebar"]::after {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 18px;
+    bottom: 15px;
     width: 95%;
     margin: 0 auto;
     text-align: center;
@@ -1034,5 +1034,6 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
 
