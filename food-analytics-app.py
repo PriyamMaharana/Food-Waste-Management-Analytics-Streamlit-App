@@ -287,7 +287,7 @@ section[data-testid="stSidebar"]::after {
 
 @media (max-width: 600px) {
   section[data-testid="stSidebar"]::after {
-      font-size: 1.3rem;
+      font-size: .75rem;
       padding-bottom: 7px;
   }
 }
@@ -1034,3 +1034,4 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
