@@ -273,10 +273,10 @@ section[data-testid="stSidebar"]::after {
     width: 95%;
     margin: 0 auto;
     text-align: center;
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: .88rem;
     color: #b8bde7;
-    opacity: 0.76;
+    opacity: 0.73;
     font-weight: 500;
     pointer-events: none;
     z-index: 5000;
@@ -288,7 +288,7 @@ section[data-testid="stSidebar"]::after {
 @media (max-width: 600px) {
   section[data-testid="stSidebar"]::after {
       font-size: .75rem;
-      padding-bottom: 7px;
+      padding-bottom: 5px;
   }
 }
 
@@ -1034,4 +1034,5 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
