@@ -82,6 +82,9 @@ h1, h2, h3 {
   .kpi-card {
     margin-bottom: 20px !important;
   }
+  .kpi-value {
+    font-size: 20px !important;
+  }
 }
 
 /* Mobile specific adjustments for devices <=600px */
@@ -790,4 +793,5 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
