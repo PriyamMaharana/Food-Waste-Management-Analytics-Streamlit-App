@@ -23,6 +23,9 @@ section[data-testid="stSidebar"] { background: #0b1324; }
 .st-emotion-cache-1wbqy5l { padding-top: 0 !important; }
 
 /* === KPI Cards styling === */
+.kpi-row > div[data-testid="column"] { 
+    min-width: 0; 
+}
 .kpi-card {
   padding: 16px;
   border-radius: 16px;
@@ -47,6 +50,20 @@ section[data-testid="stSidebar"] { background: #0b1324; }
 .kpi-sub {
   font-size: 12px;
   color: #d1d5db;
+}
+
+/* === Tabs: Desktop (Default) === */
+[data-testid="stTabs"] [role="tablist"] span {
+    font-size: 1.5em !important;
+    font-weight: 600;
+    padding: 0.4em 1.2em;
+}
+[data-testid="stTabs"] [role="tab"] {
+    min-width: 140px !important;
+}
+[data-testid="stTabs"] [role="tab"] svg {
+    width: 1.5em !important;
+    height: 1.5em !important;
 }
 
 /* === Dataframes styling === */
@@ -79,11 +96,34 @@ h1, h2, h3 {
     flex-direction: column !important;
     gap: 18px !important;
   }
+  .kpi-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 12px;
+  }
+  .kpi-row > div[data-testid="column"] {
+    flex: 0 0 48%;
+    max-width: 48%;
+    min-width: 200px;
+    margin-bottom: 0 !important;
+  }
   .kpi-card {
     margin-bottom: 20px !important;
   }
   .kpi-value {
     font-size: 20px !important;
+  }
+  /* Tabs for tablet */
+  [data-testid="stTabs"] [role="tablist"] span {
+      font-size: 1.3em !important;
+      padding: 0.32em 0.8em;
+  }
+  [data-testid="stTabs"] [role="tab"] {
+      min-width: 100px !important;
+  }
+  [data-testid="stTabs"] [role="tab"] svg {
+      width: 1.25em !important;
+      height: 1.25em !important;
   }
 }
 
@@ -92,6 +132,11 @@ h1, h2, h3 {
   .kpi-card {
     padding: 12px !important;
     font-size: 15px !important;
+  }
+  .kpi-row > div[data-testid="column"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    min-width: 140px;
   }
   h1, h2, h3 {
     font-size: 1.6em !important;
@@ -105,11 +150,18 @@ h1, h2, h3 {
   .stTabs [role="tablist"] {
     flex-wrap: wrap !important;
   }
-}
-
-/* Make tabs more readable with minimum width */
-.stTabs [role="tab"] {
-  min-width: 120px !important;
+  /* Tabs for mobile */
+  [data-testid="stTabs"] [role="tablist"] span {
+      font-size: 1.0em !important;
+      padding: 0.2em 0.5em;
+  }
+  [data-testid="stTabs"] [role="tab"] {
+      min-width: 60px !important;
+  }
+  [data-testid="stTabs"] [role="tab"] svg {
+      width: 1em !important;
+      height: 1em !important;
+  }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -793,5 +845,6 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
 
 
