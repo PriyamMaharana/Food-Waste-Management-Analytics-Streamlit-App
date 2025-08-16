@@ -138,13 +138,12 @@ section[data-testid="stSidebar"] h2 {
   text-shadow: 0 8px 32px #2a0d6099, 0 2px 12px #10162980;
 }
 section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] .stMarkdown { color: #b6b4d7 !important; font-size: 1em !important; margin-bottom: 1.08em;}
+section[data-testid="stSidebar"] .stMarkdown { color: #b6b4d7 !important; font-size: 1rem !important; margin-bottom: .08rem;}
 section[data-testid="stSidebar"] label {
   color: #e4e6fa !important;
   font-size: 1.0rem !important;
   font-weight: 700 !important;
-  margin-bottom: 0.44rem !important;
-  margin-top: 1.09rem !important;
+  margin-top: .89rem !important;
   letter-spacing: .04rem;
   padding-left: .75rem;
   display: block;
@@ -158,7 +157,7 @@ section[data-testid="stSidebar"] .stDateInput {
   color: #ffffff !important;
   border: 1.5px solid #4965fb !important;
   border-radius: 15px !important;
-  margin-bottom: .6em !important;
+  margin-bottom: .6rem !important;
   font-size: 0.95rem !important;
   box-shadow: 0 4px 24px rgba(31,60,120,0.19);
   padding: 7px 7px !important;
@@ -183,16 +182,16 @@ section[data-testid="stSidebar"] input::placeholder { color: #bbc7fd !important;
   box-shadow: 0 7px 21px rgba(25,20,61,0.23);
   border: 2px solid #8cb6ff; 
 }
-.kpi-title { font-size: 1.05rem; color:#7c8cff; font-weight: 700; margin-bottom: 7px; letter-spacing:.055em; }
-.kpi-value { font-size: 2.22rem; font-weight: 900; letter-spacing:.045em; margin-bottom: 8px; }
-.kpi-sub { font-size: .97em; color: #bdd3ea; }
+.kpi-title { font-size: 1.05rem; color:#7c8cff; font-weight: 700; margin-bottom: 7px; letter-spacing:.055rem; }
+.kpi-value { font-size: 2.22rem; font-weight: 900; letter-spacing:.045rem; margin-bottom: 8px; }
+.kpi-sub { font-size: .97rem; color: #bdd3ea; }
 
 div[data-testid="stDataFrame"] {
   background: linear-gradient(122deg, #202440 0%, #181929 120%);
   border-radius: 14px;
   box-shadow: 0 4px 12px #1c185a77;
   color: #e0eeff !important;
-  font-size: 1.02em !important;
+  font-size: 1.02rem !important;
   margin-bottom: 27px;
   overflow-x: auto;
   padding: 15px 8px !important;
@@ -200,7 +199,6 @@ div[data-testid="stDataFrame"] {
 
 /* === Tabs, Buttons, Headings as per your theme === */
 .stTabs [role="tablist"] {
-  font-size: 1.18em !important;
   font-weight: 600 !important;
   background: transparent !important;
   padding: 0 1rem !important;
@@ -421,7 +419,6 @@ st.caption("Track donations, demand, and wastage to optimize distribution.")
 
 # -------------------- KPI CARDS --------------------
 kpi_cols = st.columns(4)
-
 # Total providers
 kpi_providers = run_query("SELECT COUNT(*) AS c FROM provider_data")["c"].iloc[0] if True else 0
 # Total receivers
@@ -463,7 +460,7 @@ with kpi_cols[3]:
     <div class="kpi-card">
       <div class="kpi-title">Claims</div>
       <div class="kpi-value">{kpi_claims:,}</div>
-      <div class="kpi-sub">{date_from:%d-%b-%Y} → {date_to:%d-%b-%Y}</div>
+      <div class="kpi-sub">{date_from:%b-%Y} → {date_to:%b-%Y}</div>
     </div>
     """, unsafe_allow_html=True)
 
