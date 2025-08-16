@@ -228,6 +228,7 @@ st.markdown("# Food Donation Analytics")
 st.caption("Track donations, demand, and wastage to optimize distribution.")
 
 # -------------------- KPI CARDS --------------------
+st.markdown('<div class="kpi-row">', unsafe_allow_html=True)
 kpi_cols = st.columns(4)
 
 # Total providers
@@ -275,7 +276,7 @@ with kpi_cols[3]:
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------- TABS --------------------
 tab_dash, tab_listings, tab_contacts, tab_crud, tab_sql = st.tabs(
@@ -472,7 +473,7 @@ with tab_crud:
                             INSERT INTO provider_data (name, type, contact, address, city)
                             VALUES (:name, :type, :contact, :address, :city)
                         """, {"name": name, "type": ptype, "contact": contact, "address": address, "city": city})
-                        st.success("Provider added")
+                        st.success("Provider Added Successfully.!")
 
         elif crud_action == "Read":
             st.markdown("#### Providers")
@@ -502,7 +503,7 @@ with tab_crud:
                             SET name = :name, type = :type, contact = :contact, address = :address, city = :city
                             WHERE provider_id = :provider_id
                         """, {"name": name, "type": ptype, "contact": contact, "address": address, "city": city, "provider_id": selected_id})
-                        st.success("Provider updated")
+                        st.success("Provider Updated Successfully.!")
 
         elif crud_action == "Delete":
             st.markdown("#### Delete Provider")
@@ -513,11 +514,16 @@ with tab_crud:
                 selected_id = st.selectbox("Select", df['provider_id'].tolist())
                 if st.button("Delete"):
                     execute_query("DELETE FROM provider_data WHERE provider_id = :provider_id", {"provider_id": selected_id})
-                    st.success("Provider deleted")
+                    st.success("Provider Deleted Successfully.!")
 
     elif table == "receiver_data":
         if crud_action == "Insert":
             st.markdown("#### Add Receiver")
+            def clear_provider_form():
+                st.session_state["provider_name"] = ""
+                st.session_state["provider_contact"] = ""
+                st.session_state["provider_address"] = ""
+                st.session_state["provider_city"] = ""
             with st.form("receiver_insert_form"):
                 name = input_text("Name")
                 rtype = input_select("Type", ['Individual', 'NGO', 'Charity', 'Shelter'])
@@ -531,7 +537,7 @@ with tab_crud:
                             INSERT INTO receiver_data (name, type, contact, city)
                             VALUES (:name, :type, :contact, :city)
                         """, {"name": name, "type": rtype, "contact": contact, "city": city})
-                        st.success("Receiver added")
+                        st.success("Receiver Added Successfully.!")
 
         elif crud_action == "Read":
             st.markdown("#### Receivers")
@@ -845,7 +851,3 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
-
-
-
-
