@@ -17,12 +17,12 @@ st.set_page_config(
 # Subtle, modern CSS
 st.markdown("""
 <style>
-/* App wide */
+/* === App wide spacing and sidebar background === */
 .main { padding-top: 1rem; }
 section[data-testid="stSidebar"] { background: #0b1324; }
 .st-emotion-cache-1wbqy5l { padding-top: 0 !important; }
 
-/* KPI cards */
+/* === KPI Cards styling === */
 .kpi-card {
   padding: 16px;
   border-radius: 16px;
@@ -30,22 +30,83 @@ section[data-testid="stSidebar"] { background: #0b1324; }
   color: #fff;
   box-shadow: 0 8px 18px rgba(0,0,0,0.25);
   border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 16px;
 }
-.kpi-title { font-size: 13px; color: #93c5fd; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-.kpi-value { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
-.kpi-sub { font-size: 12px; color: #d1d5db; }
+.kpi-title {
+  font-size: 13px;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 4px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.kpi-sub {
+  font-size: 12px;
+  color: #d1d5db;
+}
 
-/* Dataframes */
-div[data-testid="stDataFrame"] { border-radius: 12px; overflow: hidden; }
+/* === Dataframes styling === */
+div[data-testid="stDataFrame"] {
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
 
-/* Headings */
-h1, h2, h3 { color: #111827; }
+/* === Headings custom color === */
+h1, h2, h3 {
+  color: #FFFFFF !important;
+}
 
-/* Buttons */
-.stButton>button {
+/* === Buttons styling === */
+.stButton > button {
   border-radius: 10px;
-  padding: .6rem 1rem;
+  padding: 0.6rem 1rem;
   font-weight: 600;
+}
+
+/* === Responsive layout adjustments === */
+
+/* Stack columns vertically and add gap on smaller than 900px */
+@media (max-width: 900px) {
+  .st-emotion-cache-1wbqy5l section[data-testid="column"],
+  .st-emotion-cache-1wbqy5l section[data-testid="stHorizontalBlock"] {
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+  .kpi-card {
+    margin-bottom: 20px !important;
+  }
+}
+
+/* Mobile specific adjustments for devices <=600px */
+@media (max-width: 600px) {
+  .kpi-card {
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+  h1, h2, h3 {
+    font-size: 1.6em !important;
+    padding-top: 6px !important;
+    padding-bottom: 4px !important;
+  }
+  div[data-testid="stDataFrame"] {
+    font-size: 13px !important;
+    max-width: 98vw;
+  }
+  .stTabs [role="tablist"] {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Make tabs more readable with minimum width */
+.stTabs [role="tab"] {
+  min-width: 120px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -729,3 +790,4 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
