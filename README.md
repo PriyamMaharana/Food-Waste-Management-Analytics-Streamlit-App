@@ -1,4 +1,4 @@
-# Food Waste Management Analytics – Streamlit App
+## Food Waste Management Analytics – Streamlit App
 
 Food wastage is a significant issue, with many households and restaurants discarding surplus food while numerous people struggle with food insecurity.  
 This project develops a Local Food Wastage Management System where:
@@ -7,7 +7,7 @@ This project develops a Local Food Wastage Management System where:
 - NGOs or individuals in need can claim the food.
 - SQL stores available food details and locations.
 - A Streamlit app enables interaction, filtering, CRUD operations, and visualization.
-- Project link: https://food-waste-management-analytics.streamlit.app/ (Note: This link will only work till Sept 2025)
+- Project link: https://food-waste-management-analytics.streamlit.app/ (Note: The link is valid until Oct 2025)
 ---
 
 ## Features
