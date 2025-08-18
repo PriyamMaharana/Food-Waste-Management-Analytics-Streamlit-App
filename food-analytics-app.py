@@ -399,15 +399,32 @@ filter_city = st.sidebar.selectbox("City", ["All"] + cities, index=0)
 filter_ptype = st.sidebar.selectbox("Provider Type", ["All"] + provider_types, index=0)
 filter_food = st.sidebar.selectbox("Food Type", ["All"] + food_types, index=0)
 
+
 # Date range filter (for claims / wastage)
 today = date.today()
 default_from = date(today.year, 1, 1)
 date_from, date_to = st.sidebar.date_input(
     "Date Range (claims/wastage)",
     value=(default_from, today)
-)
+) if "st.sidebar" else (default_from, today)
+if isinstance(date_from, tuple): # older streamlit fallback
+    date_from, date_to = date_from
 
-# ------------- SQL WHERE HELPERS -------------
+# Dynamic WHERE for providers (uses filter_city)
+provider_where = ["1=1"]
+provider_params = {}
+if filter_city != "All":
+    provider_where.append("city = :city")
+    provider_params["city"] = filter_city
+
+# Dynamic WHERE for receivers (uses filter_city)
+receiver_where = ["1=1"]
+receiver_params = {}
+if filter_city != "All":
+    receiver_where.append("city = :city")
+    receiver_params["city"] = filter_city
+    
+# Helper to build WHERE snippets for food_data
 food_where = ["1=1"]
 food_params = {}
 if filter_city != "All":
@@ -421,25 +438,26 @@ if filter_food != "All":
     food_params["f_food"] = filter_food
 FOOD_WHERE_SQL = " AND ".join(food_where)
 
+# Claims date filter (timestamp column)
 claim_where = ["1=1", "c.timestamp::date BETWEEN :d_from AND :d_to"]
 claim_params = {"d_from": date_from, "d_to": date_to}
 
-# ------------- HEADER -------------
+# -------------------- HEADER --------------------
 st.markdown("# Food Donation Analytics")
 st.caption("Track donations, demand, and wastage to optimize distribution.")
 
-# ------------- KPI CARDS -------------
+# -------------------- KPI CARDS --------------------
 kpi_cols = st.columns(4)
-@st.cache_data(ttl=60)
-def get_kpis(food_params, claim_params):
-    kpi_providers = run_query("SELECT COUNT(*) AS c FROM provider_data")["c"].iloc[0]
-    kpi_receivers = run_query("SELECT COUNT(*) AS c FROM receiver_data")["c"].iloc
-    kpi_food_qty = run_query(f"SELECT COALESCE(SUM(quantity),0) AS qty FROM food_data f WHERE {FOOD_WHERE_SQL}", food_params)["qty"].iloc
-    kpi_claims = run_query("SELECT COUNT(*) AS c FROM claim_data c WHERE " + " AND ".join(claim_where), claim_params)["c"].iloc
-    return kpi_providers, kpi_receivers, kpi_food_qty, kpi_claims
-kpi_providers, kpi_receivers, kpi_food_qty, kpi_claims = get_kpis(food_params, claim_params)
+# Total providers
+kpi_providers = run_query(f"SELECT COUNT(*) AS c FROM provider_data WHERE {' AND '.join(provider_where)}", provider_params)["c"].iloc[0] if True else 0
+# Total receivers
+kpi_receivers = run_query(f"SELECT COUNT(*) AS c FROM receiver_data WHERE {' AND '.join(receiver_where)}", receiver_params)["c"].iloc[0] if True else 0
+# Total food quantity (available)
+kpi_food_qty = run_query(f"SELECT COALESCE(SUM(quantity),0) AS qty FROM food_data f WHERE {FOOD_WHERE_SQL}", food_params)["qty"].iloc[0]
+# Claims in date window
+kpi_claims = run_query(f"SELECT COUNT(*) AS c FROM claim_data c JOIN food_data f ON c.food_id = f.food_id WHERE {FOOD_WHERE_SQL} AND {claim_where[1]}", {**food_params, **claim_params})["c"].iloc[0]
 
-with kpi_cols:
+with kpi_cols[0]:
     st.markdown(f"""
     <div class="kpi-card">
       <div class="kpi-title">Providers</div>
@@ -447,6 +465,7 @@ with kpi_cols:
       <div class="kpi-sub">Active donors</div>
     </div>
     """, unsafe_allow_html=True)
+
 with kpi_cols[1]:
     st.markdown(f"""
     <div class="kpi-card">
@@ -455,7 +474,8 @@ with kpi_cols[1]:
       <div class="kpi-sub">Individuals & Orgs</div>
     </div>
     """, unsafe_allow_html=True)
-with kpi_cols:
+
+with kpi_cols[2]:
     st.markdown(f"""
     <div class="kpi-card">
       <div class="kpi-title">Availability</div>
@@ -463,7 +483,8 @@ with kpi_cols:
       <div class="kpi-sub">Filtered scope</div>
     </div>
     """, unsafe_allow_html=True)
-with kpi_cols:
+
+with kpi_cols[3]:
     st.markdown(f"""
     <div class="kpi-card">
       <div class="kpi-title">Claims</div>
@@ -1024,3 +1045,4 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
+
