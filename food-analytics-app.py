@@ -1,4 +1,4 @@
-# -----------  app.py  -----------------------
+# app.py
 import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -33,8 +33,8 @@ body, .main, .block-container, #root {
 section[data-testid="stSidebar"] {
     position: relative !important;
     background: linear-gradient(120deg, rgba(255,255,255,0.16) 0%, rgba(14,17,23,0.58) 25%, rgba(14,17,23,0.45) 85% );
-    backdrop-filter: blur(14px) saturate(1.18);
-    -webkit-backdrop-filter: blur(18px) saturate(1.18);
+    backdrop-filter: blur(8px) saturate(1.18);
+    -webkit-backdrop-filter: blur(8px) saturate(1.18);
     box-shadow: 0 8px 32px 0 rgba(31,38,135,0.19), 0 1.5px 9px 0 rgba(32,34,51,0.27) inset;
     border-right: 2px solid rgba(255,255,255,0.12);
     min-height: 100vh !important;
@@ -370,7 +370,13 @@ def execute_query(query, params=None):
 
 # -------------------- SIDEBAR FILTERS --------------------
 st.sidebar.title("🍽️ Food Donation")
-st.sidebar.caption("Filters apply to dashboards & insights")
+st.sidebar.markdown("""
+<div style="font-size:1rem; color:#b6b4d7 80%; margin-bottom:1.5rem; letter-spacing: .16rem;">
+Filters apply to dashboards &amp; insights
+</div>
+""", unsafe_allow_html=True)
+
+# st.sidebar.caption("Filters apply to dashboards & insights")
 
 # Load filter values (robust)
 try:
@@ -432,7 +438,12 @@ claim_params = {"d_from": date_from, "d_to": date_to}
 
 # -------------------- HEADER --------------------
 st.markdown("# Food Donation Analytics")
-st.caption("Track donations, demand, and wastage to optimize distribution.")
+st.markdown("""
+<div style="font-size:1rem; color:#b6b4d7 80%; margin-bottom:1.5rem; letter-spacing: .16rem;">
+Track donations, demand, and wastage to optimize distribution.
+</div>
+""", unsafe_allow_html=True)
+# st.caption("Track donations, demand, and wastage to optimize distribution.")
 
 # -------------------- KPI CARDS --------------------
 kpi_cols = st.columns(4)
@@ -522,7 +533,7 @@ with tab_dash:
         st.subheader("Top Providers (by Quantity)")
         if not df_top_providers.empty:
             fig = px.bar(df_top_providers, x="provider", y="total_quantity", text_auto=True)
-            fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10))
+            fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Provider", yaxis_title="Total_Quantity")
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("No data for the selected filters.")
@@ -562,7 +573,7 @@ with tab_dash:
                 height=380,
                 margin=dict(l=10, r=10, t=30, b=10),
                 xaxis_title="City",
-                yaxis_title="Total Claims"
+                yaxis_title="Total_Claims"
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
