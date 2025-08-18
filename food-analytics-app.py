@@ -1,4 +1,4 @@
-# ---------------- app ---------------------
+# -----------  app.py  -----------------------
 import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -6,7 +6,7 @@ from datetime import datetime, date
 import plotly.express as px
 import plotly.graph_objects as go
 
-# ------------- PAGE CONFIG & THEME -------------
+# -------------------- PAGE CONFIG & THEME --------------------
 st.set_page_config(
     page_title="Food Donation Analytics",
     page_icon="🍽️",
@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ------------- MODERN CSS (minimal rerun cost) -------------
+# Subtle, modern CSS
 st.markdown("""
 <style>
 /* === Main area: deep navy/indigo gradient, matching graph backgrounds === */
@@ -143,8 +143,8 @@ section[data-testid="stSidebar"] label {
   color: #e4e6fa !important;
   font-size: 1.0rem !important;
   font-weight: 700 !important;
-  margin-top: .89rem !important;
-  letter-spacing: .04rem;
+  margin-top: .59rem !important;
+  letter-spacing: .1rem;
   padding-left: .75rem;
   display: block;
   text-shadow: 0 2px 10px #11123d71;
@@ -157,10 +157,11 @@ section[data-testid="stSidebar"] .stDateInput {
   color: #ffffff !important;
   border: 1.5px solid #4965fb !important;
   border-radius: 15px !important;
-  margin-bottom: .6rem !important;
-  font-size: 0.95rem !important;
+  margin-bottom: .4rem !important;
+  min-height: 24px !important;
+  font-size: 0.80rem !important;
   box-shadow: 0 4px 24px rgba(31,60,120,0.19);
-  padding: 7px 7px !important;
+  padding: 4px 6px !important;
 }
 section[data-testid="stSidebar"] select:focus,
 section[data-testid="stSidebar"] input[type="date"]:focus,
@@ -355,45 +356,30 @@ section[data-testid="stSidebar"]::after {
 </style>
 """, unsafe_allow_html=True)
 
-# ------------- DB CONNECTION (cached for performance) -------------
-@st.cache_resource
-def get_engine():
-    return create_engine(
-        # Use streamlit/secrets.toml or env variable for sensitive info!
-        'postgresql://food_db_pl5v_user:AJUC866X0m9y76r1Pl9mneeghYCDiq95@dpg-d2fphi8dl3ps73eh4h6g-a.singapore-postgres.render.com/food_db_pl5v'
-    )
-
-engine = get_engine()
+# -------------------- DB CONNECTION --------------------
+# engine = create_engine('postgresql+psycopg2://postgres:1234@localhost:5432/food_db')
+engine = create_engine('postgresql://food_db_pl5v_user:AJUC866X0m9y76r1Pl9mneeghYCDiq95@dpg-d2fphi8dl3ps73eh4h6g-a.singapore-postgres.render.com/food_db_pl5v')
 
 def run_query(query, params=None):
     with engine.connect() as conn:
-        return pd.read_sql(text(query), conn, params=params or {})
+        return pd.read_sql(text(query), conn, params=params)
 
 def execute_query(query, params=None):
     with engine.begin() as conn:
         conn.execute(text(query), params or {})
 
-# ------------- SIDEBAR FILTERS (cached for speed) -------------
+# -------------------- SIDEBAR FILTERS --------------------
 st.sidebar.title("🍽️ Food Donation")
 st.sidebar.caption("Filters apply to dashboards & insights")
 
-@st.cache_data(ttl=600)
-def get_filter_options():
-    try:
-        cities = run_query("SELECT DISTINCT city FROM provider_data WHERE city IS NOT NULL ORDER BY city")['city'].dropna().tolist()
-    except Exception:
-        cities = []
-    try:
-        provider_types = run_query("SELECT DISTINCT provider_type FROM food_data WHERE provider_type IS NOT NULL ORDER BY provider_type")['provider_type'].dropna().tolist()
-    except Exception:
-        provider_types = []
-    try:
-        food_types = run_query("SELECT DISTINCT food_type FROM food_data WHERE food_type IS NOT NULL ORDER BY food_type")['food_type'].dropna().tolist()
-    except Exception:
-        food_types = []
-    return cities, provider_types, food_types
-
-cities, provider_types, food_types = get_filter_options()
+# Load filter values (robust)
+try:
+    cities = run_query("SELECT DISTINCT city FROM provider_data WHERE city IS NOT NULL ORDER BY city")['city'].dropna().tolist()
+    provider_types = run_query("SELECT DISTINCT provider_type FROM food_data WHERE provider_type IS NOT NULL ORDER BY provider_type")['provider_type'].dropna().tolist()
+    food_types = run_query("SELECT DISTINCT food_type FROM food_data WHERE food_type IS NOT NULL ORDER BY food_type")['food_type'].dropna().tolist()
+except Exception as err:
+    st.sidebar.error(f"Filter load failed: {err}")
+    cities, provider_types, food_types = [], [], []
 
 filter_city = st.sidebar.selectbox("City", ["All"] + cities, index=0)
 filter_ptype = st.sidebar.selectbox("Provider Type", ["All"] + provider_types, index=0)
@@ -408,6 +394,8 @@ date_from, date_to = st.sidebar.date_input(
     value=(default_from, today)
 ) if "st.sidebar" else (default_from, today)
 if isinstance(date_from, tuple): # older streamlit fallback
+    date_from = date_from.strftime("%d-%m-%Y")
+    date_to = date_to.strftime("%d-%m-%Y")
     date_from, date_to = date_from
 
 # Dynamic WHERE for providers (uses filter_city)
@@ -492,18 +480,19 @@ with kpi_cols[3]:
       <div class="kpi-sub">{date_from:%b-%Y} → {date_to:%b-%Y}</div>
     </div>
     """, unsafe_allow_html=True)
+
 st.markdown("")
 
-# ------------- TABS -------------
+# -------------------- TABS --------------------
 tab_dash, tab_listings, tab_contacts, tab_crud, tab_sql = st.tabs(
     ["📊 Dashboard", "📋 Listings", "📇 Contacts", "🛠️ CRUD", "🧠 SQL Insights"]
 )
 
-# ------------- DASHBOARD -------------
+# -------------------- DASHBOARD --------------------
 with tab_dash:
     colA, colB = st.columns([1.2, 1.0])
 
-    # Top Providers (bar)
+    # Top Providers by total quantity (filtered by sidebar)
     top_providers_sql = f"""
         SELECT p.name AS provider, SUM(f.quantity) AS total_quantity
         FROM food_data f
@@ -514,15 +503,15 @@ with tab_dash:
         LIMIT 10;
     """
     df_top_providers = run_query(top_providers_sql, food_params)
-    # Highest Demand Locations (bar)
+
+    # Highest Demand Locations (by completed claims in date window)
     top_locations_sql = f"""
         SELECT r.city, COUNT(*) AS total_claims
         FROM claim_data c
         JOIN receiver_data r ON c.receiver_id = r.receiver_id
         JOIN food_data f ON c.food_id = f.food_id
-        WHERE c.status = 'Completed'
-          AND {FOOD_WHERE_SQL}
-          AND {claim_where[1]}
+        WHERE c.status IN ('Completed')
+        AND {FOOD_WHERE_SQL.replace('f.', 'f.')}
         GROUP BY r.city
         ORDER BY total_claims DESC
         LIMIT 10;
@@ -557,10 +546,24 @@ with tab_dash:
             st.info("No claims found in the date range.")
 
     with colB:
-        st.subheader("Highest Demand Locations (Completed Claims)")
+        st.subheader("Highest Demand Locations")
         if not df_top_locations.empty:
-            fig = px.bar(df_top_locations, x="city", y="total_claims", text_auto=True)
-            fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10))
+            # fig = px.bar(df_top_locations, x="city", y="total_claims", text_auto=True)
+            # fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10))
+            fig = px.line(
+                df_top_locations,
+                x="city",
+                y="total_claims",
+                markers=True,        # Optional: shows points on the line
+                text="total_claims"  # Shows the claim numbers as labels
+            )
+            fig.update_traces(textposition="top center")
+            fig.update_layout(
+                height=380,
+                margin=dict(l=10, r=10, t=30, b=10),
+                xaxis_title="City",
+                yaxis_title="Total Claims"
+            )
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("No location demand for selected filters/date range.")
@@ -594,20 +597,19 @@ with tab_dash:
         else:
             st.info("No wastage detected in the date range.")
 
-# ------------- LISTINGS -------------
+# -------------------- LISTINGS --------------------
 with tab_listings:
     st.subheader("Filtered Food Listings")
     list_sql = f"""
         SELECT f.*
         FROM food_data f
         WHERE {FOOD_WHERE_SQL}
-        ORDER BY f.expiry_date NULLS LAST
-        LIMIT 200 -- for performance
+        ORDER BY f.expiry_date NULLS LAST;
     """
     food_df = run_query(list_sql, food_params)
     st.dataframe(food_df, use_container_width=True)
 
-# ------------- CONTACTS -------------
+# -------------------- CONTACTS --------------------
 def generate_contact_html_table(df, city_col_exists=True):
     html = """
     <div style="overflow-y:auto; max-height:360px; border:1px solid #e5e7eb; border-radius:12px;">
@@ -643,7 +645,7 @@ with tab_contacts:
 
     with c2:
         st.markdown("### Receivers")
-        receiver_cities = run_query("SELECT DISTINCT city FROM receiver_data WHERE city IS NOT NULL ORDER BY city")['city'].tolist()
+        receiver_cities = run_query("SELECT DISTINCT city FROM receiver_data ORDER BY city")['city'].tolist()
         rec_city = st.selectbox("City", ["All"] + receiver_cities, key="rec_city_ui")
         if rec_city == "All":
             rec_df = run_query("SELECT name, contact, city FROM receiver_data")
@@ -651,7 +653,7 @@ with tab_contacts:
             rec_df = run_query("SELECT name, contact, city FROM receiver_data WHERE city = :rcity", {"rcity": rec_city})
         st.markdown(generate_contact_html_table(rec_df, city_col_exists=True), unsafe_allow_html=True)
 
-# ------------- CRUD -------------
+# -------------------- CRUD (kept from your app, lightly polished) --------------------
 with tab_crud:
     st.subheader("Manage Data")
     table = st.selectbox("Table", ["provider_data", "receiver_data", "food_data", "claim_data"], index=0)
@@ -667,7 +669,7 @@ with tab_crud:
         return st.number_input(label, value=value, min_value=min_value, max_value=max_value)
 
     def input_date(label, value=None):
-        return st.date_input(label, value or date.today())
+        return st.date_input(label, value)
 
     def input_datetime(label, value=None):
         return st.date_input(label, value if value else datetime.now())
@@ -690,10 +692,12 @@ with tab_crud:
                             VALUES (:name, :type, :contact, :address, :city)
                         """, {"name": name, "type": ptype, "contact": contact, "address": address, "city": city})
                         st.success("Provider added")
+
         elif crud_action == "Read":
             st.markdown("#### Providers")
-            df = run_query("SELECT * FROM provider_data LIMIT 200")
+            df = run_query("SELECT * FROM provider_data")
             st.dataframe(df, use_container_width=True)
+
         elif crud_action == "Update":
             st.markdown("#### Update Provider")
             df = run_query("SELECT * FROM provider_data")
@@ -718,6 +722,7 @@ with tab_crud:
                             WHERE provider_id = :provider_id
                         """, {"name": name, "type": ptype, "contact": contact, "address": address, "city": city, "provider_id": selected_id})
                         st.success("Provider updated")
+
         elif crud_action == "Delete":
             st.markdown("#### Delete Provider")
             df = run_query("SELECT * FROM provider_data")
@@ -728,6 +733,7 @@ with tab_crud:
                 if st.button("Delete"):
                     execute_query("DELETE FROM provider_data WHERE provider_id = :provider_id", {"provider_id": selected_id})
                     st.success("Provider deleted")
+
     elif table == "receiver_data":
         if crud_action == "Insert":
             st.markdown("#### Add Receiver")
@@ -745,9 +751,11 @@ with tab_crud:
                             VALUES (:name, :type, :contact, :city)
                         """, {"name": name, "type": rtype, "contact": contact, "city": city})
                         st.success("Receiver added")
+
         elif crud_action == "Read":
             st.markdown("#### Receivers")
-            st.dataframe(run_query("SELECT * FROM receiver_data LIMIT 200"), use_container_width=True)
+            st.dataframe(run_query("SELECT * FROM receiver_data"), use_container_width=True)
+
         elif crud_action == "Update":
             st.markdown("#### Update Receiver")
             df = run_query("SELECT * FROM receiver_data")
@@ -770,6 +778,7 @@ with tab_crud:
                             WHERE receiver_id = :receiver_id
                         """, {"name": name, "type": rtype, "contact": contact, "city": city, "receiver_id": selected_id})
                         st.success("Receiver updated")
+
         elif crud_action == "Delete":
             st.markdown("#### Delete Receiver")
             df = run_query("SELECT * FROM receiver_data")
@@ -780,6 +789,7 @@ with tab_crud:
                 if st.button("Delete"):
                     execute_query("DELETE FROM receiver_data WHERE receiver_id = :receiver_id", {"receiver_id": selected_id})
                     st.success("Receiver deleted")
+
     elif table == "food_data":
         if crud_action == "Insert":
             st.markdown("#### Add Food Listing")
@@ -805,9 +815,11 @@ with tab_crud:
                             "location": location, "food_type": food_type_, "meal_type": meal_type
                         })
                         st.success("Food listing added")
+
         elif crud_action == "Read":
             st.markdown("#### Food Listings")
-            st.dataframe(run_query("SELECT * FROM food_data LIMIT 200"), use_container_width=True)
+            st.dataframe(run_query("SELECT * FROM food_data"), use_container_width=True)
+
         elif crud_action == "Update":
             st.markdown("#### Update Food Listing")
             df = run_query("SELECT * FROM food_data")
@@ -845,6 +857,7 @@ with tab_crud:
                             "food_id": int(selected_id)
                         })
                         st.success("Food listing updated")
+
         elif crud_action == "Delete":
             st.markdown("#### Delete Food Listing")
             df = run_query("SELECT * FROM food_data")
@@ -855,6 +868,7 @@ with tab_crud:
                 if st.button("Delete"):
                     execute_query("DELETE FROM food_data WHERE food_id = :food_id", {"food_id": selected_id})
                     st.success("Food listing deleted")
+
     elif table == "claim_data":
         if crud_action == "Insert":
             st.markdown("#### Add Claim")
@@ -869,9 +883,11 @@ with tab_crud:
                         VALUES (:food_id, :receiver_id, :status, :timestamp)
                     """, {"food_id": food_id, "receiver_id": receiver_id, "status": status, "timestamp": timestamp})
                     st.success("Claim added")
+
         elif crud_action == "Read":
             st.markdown("#### Claims")
-            st.dataframe(run_query("SELECT * FROM claim_data LIMIT 200"), use_container_width=True)
+            st.dataframe(run_query("SELECT * FROM claim_data"), use_container_width=True)
+
         elif crud_action == "Update":
             st.markdown("#### Update Claim")
             df = run_query("SELECT * FROM claim_data")
@@ -894,6 +910,7 @@ with tab_crud:
                             WHERE claim_id = :claim_id
                         """, {"food_id": food_id, "receiver_id": receiver_id, "status": status, "timestamp": timestamp, "claim_id": int(selected_id)})
                         st.success("Claim updated")
+
         elif crud_action == "Delete":
             st.markdown("#### Delete Claim")
             df = run_query("SELECT * FROM claim_data")
@@ -905,7 +922,7 @@ with tab_crud:
                     execute_query("DELETE FROM claim_data WHERE claim_id = :claim_id", {"claim_id": selected_id})
                     st.success("Claim deleted")
 
-# ------------- SQL INSIGHTS -------------
+# -------------------- SQL INSIGHTS --------------------
 with tab_sql:
     st.subheader("One-click SQL Insights")
     insights = {
@@ -966,7 +983,7 @@ with tab_sql:
             FROM claim_data c
             JOIN food_data f ON c.food_id = f.food_id
             JOIN provider_data p ON f.provider_id = p.provider_id
-            WHERE c.status = 'Completed' AND {claim_where[1]}
+            WHERE c.status = 'Completed' AND {claim_where[1].replace('c.', 'c.')}
               AND {FOOD_WHERE_SQL}
             GROUP BY p.provider_id, p.name
             ORDER BY successful_donated DESC;
@@ -1030,6 +1047,8 @@ with tab_sql:
             ORDER BY wasted_items DESC;
         """,
     }
+
+    # Run selected insight
     selected = st.selectbox("Pick an insight", list(insights.keys()), index=0)
     params = {**food_params, **claim_params, "w_from": date_from, "w_to": date_to}
     if st.button("Run Insight"):
@@ -1045,4 +1064,3 @@ with tab_sql:
                 st.plotly_chart(px.pie(df, names="status", values="percentage", hole=.45), use_container_width=True)
         except Exception as e:
             st.error(f"Error running query: {e}")
-
